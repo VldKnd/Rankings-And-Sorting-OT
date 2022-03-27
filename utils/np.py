@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 def get_distr(u, v, K):
     """
     Given a, b functions retunrs the distribution of mass
@@ -65,45 +68,6 @@ def Sinkhorn(a, b, X , Y, eps, h, nu):
         u = a/(K@v)
         
     return u, v, K
-
-def Rank_Sort(a, x, b, y, eps=0.1, h=L2, nu=1e-5):
-    """
-    Function to get Ranking and Sorted values
-    
-    This is the numericaly unstable version, does not work with eps <= 0.01.
-    
-    Parameters
-    ----------
-    a : np.array, dims = (N_x)
-         Marginal distribution of x's
-        
-    x : np.array, dims = (N_x)
-        Numbers to be sorted,  (default is 0.1)
-        
-    b : np.array, dims = (N_y)
-        Marginal distribution of y's
-        
-    y : np.array, dims = (N_y)
-        Milestones to be compared against, its expected to be equaly space from 0 to 1
-        
-    eps : float, optional
-        Strength of regularisation (default is 0.1)
-        
-    h : function, optional
-        Function representing distance between two elements. Its expected to be convex (default is L2)
-        
-    nu : float, optional
-        Error to tolerate for convergance (default is 1e-5)
-    """
-        
-    u, v, K = Sinkhorn(a, b, x, y, eps, h, nu)
-    b_hat = np.cumsum(b)
-    n = x.shape[0]
-    
-    R_tilda = (n*(a**-1))*u*(K@(v*b_hat))
-    S_tilda = (b**-1)*v*(K.T@(u*x))
-    
-    return R_tilda, S_tilda
     
 def soft_min(M, eps):
     """
@@ -281,3 +245,42 @@ def L2(x, y):
     """
     
     return np.sum( (x - y)**2 )
+
+def Rank_Sort(a, x, b, y, eps=0.1, h=L2, nu=1e-5):
+    """
+    Function to get Ranking and Sorted values
+    
+    This is the numericaly unstable version, does not work with eps <= 0.01.
+    
+    Parameters
+    ----------
+    a : np.array, dims = (N_x)
+         Marginal distribution of x's
+        
+    x : np.array, dims = (N_x)
+        Numbers to be sorted,  (default is 0.1)
+        
+    b : np.array, dims = (N_y)
+        Marginal distribution of y's
+        
+    y : np.array, dims = (N_y)
+        Milestones to be compared against, its expected to be equaly space from 0 to 1
+        
+    eps : float, optional
+        Strength of regularisation (default is 0.1)
+        
+    h : function, optional
+        Function representing distance between two elements. Its expected to be convex (default is L2)
+        
+    nu : float, optional
+        Error to tolerate for convergance (default is 1e-5)
+    """
+        
+    u, v, K = Sinkhorn(a, b, x, y, eps, h, nu)
+    b_hat = np.cumsum(b)
+    n = x.shape[0]
+    
+    R_tilda = (n*(a**-1))*u*(K@(v*b_hat))
+    S_tilda = (b**-1)*v*(K.T@(u*x))
+    
+    return R_tilda, S_tilda
